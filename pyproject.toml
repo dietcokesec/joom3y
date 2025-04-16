@@ -1,0 +1,13 @@
+[project]
+name = "joom3y"
+version = "1.0.0"
+description = "A modern version of drego85's 'joomla scan'"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "bs4>=0.0.2",
+    "faker>=37.1.0",
+    "requests>=2.32.3",
+    "rich>=14.0.0",
+    "typer>=0.15.2",
+]
