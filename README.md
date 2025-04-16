@@ -1,3 +1,5 @@
+*This work has been sponsored by [Sythe Labs](https://sythelabs.com).*
+
 # Joomla Scan
 A free and open source software to find the components installed in Joomla CMS, built out of the ashes of Joomscan and Joomla Scan. This project is a fork of Joomla Scan by drego85 on github. It was modernized and improved considerably.
 
@@ -53,6 +55,3 @@ We *strongly* recommend using `uv` as it is fast and more modern. It'll automati
 
 # License
 GNU, version 3
-
-
-*This work has been sponsored by [Sythe Labs](https://sythelabs.com).*
