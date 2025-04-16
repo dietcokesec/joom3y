@@ -24,7 +24,7 @@ def main(
     """Joomla login bruteforce tool."""
     print("[bold blue]Starting bruteforce attack...[/bold blue]")
     # add userlist
-    joomla_brute(url=url, wordlist=wordlist, verbose=verbose)
+    joomla_brute(url=url, wordlist=wordlist, username=username, verbose=verbose)
 
 if __name__ == "__main__":
     app()

