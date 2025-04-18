@@ -17,6 +17,9 @@ def main(
     username: Annotated[
         str, Option("--username", "-usr", help="Username to bruteforce.")
     ] = "admin",
+    threads: Annotated[
+        int, Option("--threads", "-t", help="Number of threads to use for bruteforce.")
+    ] = 8,
     verbose: Annotated[
         bool, Option("--verbose", "-v", help="Show verbose output.")
     ] = False,
@@ -24,7 +27,7 @@ def main(
     """Joomla login bruteforce tool."""
     print("[bold blue]Starting bruteforce attack...[/bold blue]")
     # add userlist
-    joomla_brute(url=url, wordlist=wordlist, username=username, verbose=verbose)
+    joomla_brute(url=url, wordlist=wordlist, username=username, threads=threads, verbose=verbose)
 
 if __name__ == "__main__":
     app()

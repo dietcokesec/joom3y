@@ -45,7 +45,7 @@ def try_password(args):
             print(f"\n[green]Success! {current_username}:{password}[/green]")
         return True
 
-def try_login(current_username, admin_url, proxy_dict, cookies, option, task, ret, verbose, wordlist):
+def try_login(current_username, admin_url, proxy_dict, cookies, option, task, ret, verbose, wordlist, threads):
     print(f"[blue]Starting bruteforce for username: {current_username}[/blue]")
     passwords = get_data(wordlist)
     total_passwords = len(passwords)
@@ -54,12 +54,12 @@ def try_login(current_username, admin_url, proxy_dict, cookies, option, task, re
     args_list = [(password, current_username, admin_url, proxy_dict, cookies, option, task, ret, verbose) 
                  for password in passwords]
     
-    with ThreadPoolExecutor(max_workers=20) as executor:
+    with ThreadPoolExecutor(max_workers=threads) as executor:
         results = list(executor.map(try_password, args_list))
         
     return True in results
 
-def joomla_brute(url: str, wordlist: str, username: str = None, userlist: str = None, proxy: str = None, verbose: bool = False):
+def joomla_brute(url: str, wordlist: str, username: str = None, userlist: str = None, proxy: str = None, verbose: bool = False, threads: int = 8):
     """
     Perform Joomla login bruteforce attack
     
@@ -70,6 +70,7 @@ def joomla_brute(url: str, wordlist: str, username: str = None, userlist: str = 
         userlist (str, optional): Path to username list file
         proxy (str, optional): Proxy URL (e.g. http://127.0.0.1:8080)
         verbose (bool, optional): Show verbose output
+        threads (int, optional): Number of threads to use for bruteforce (default: 8)
     """
     if not username and not userlist:
         raise ValueError("Either username or userlist must be provided")
@@ -94,7 +95,7 @@ def joomla_brute(url: str, wordlist: str, username: str = None, userlist: str = 
     if userlist:
         users = get_data(userlist)
         for user in users:
-            if try_login(user.decode('utf-8'), admin_url, proxy_dict, cookies, option, task, ret, verbose, wordlist):
+            if try_login(user.decode('utf-8'), admin_url, proxy_dict, cookies, option, task, ret, verbose, wordlist, threads):
                 break
     else:
-        try_login(username, admin_url, proxy_dict, cookies, option, task, ret, verbose, wordlist)
+        try_login(username, admin_url, proxy_dict, cookies, option, task, ret, verbose, wordlist, threads)
