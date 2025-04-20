@@ -1,1 +1,0 @@
-test: uv run main.py -u http://app.inlanefreight.local -w ./rockyou.txt -usr admin -v -t 20
