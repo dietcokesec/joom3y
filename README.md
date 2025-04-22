@@ -18,22 +18,59 @@ A free and open source software to find the components installed in Joomla CMS, 
 * A database of vulnerable components
 
 # Usage
+```                                                                    
+ Usage: main.py [OPTIONS] COMMAND [ARGS]...                                                   
+                                                                                              
+╭─ Options ──────────────────────────────────────────────────────────────────────────────────╮
+│ --install-completion          Install completion for the current shell.                    │
+│ --show-completion             Show completion for the current shell, to copy it or         │
+│                               customize the installation.                                  │
+│ --help                        Show this message and exit.                                  │
+╰────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ─────────────────────────────────────────────────────────────────────────────────╮
+│ enumerate                                                                                  │
+│ brute       Joomla login bruteforce tool.                                                  │
+╰────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
- Usage: main.py [OPTIONS]
 
-╭─ Options ──────────────────────────────────────────────────────────────────────────────╮
-│ *  --url                 -u      TEXT     The Joomla URL to scan. [default: None]      │
-│                                           [required]                                   │
-│    --threads             -t      INTEGER  Number of threads to use. [default: 10]      │
-│    --user-agent          -a      TEXT     The user agent to use. [default: None]       │
-│    --timeout             -T      INTEGER  The timeout before moving on with an http    │
-│                                           request to joomla.                           │
-│                                           [default: 5]                                 │
-│    --install-completion                   Install completion for the current shell.    │
-│    --show-completion                      Show completion for the current shell, to    │
-│                                           copy it or customize the installation.       │
-│    --help                                 Show this message and exit.                  │
-╰────────────────────────────────────────────────────────────────────────────────────────╯
+```                                                                                
+ Usage: main.py enumerate [OPTIONS]                                                           
+                                                                                              
+╭─ Options ──────────────────────────────────────────────────────────────────────────────────╮
+│ *  --url         -u      TEXT     The Joomla URL to scan. [default: None] [required]       │
+│    --threads     -t      INTEGER  Number of threads to use. [default: 16]                  │
+│    --user-agent  -a      TEXT     The user agent to use. [default: None]                   │
+│    --timeout     -T      INTEGER  The timeout before moving on with an http request to     │
+│                                   joomla.                                                  │
+│                                   [default: 5]                                             │
+│    --help                         Show this message and exit.                              │
+╰────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+Example of enumerate:
+```
+uv run main.py enumerate --url http://example.com
+python3 main.py enumerate --url http://example.com
+```
+
+```                                                                                              
+ Usage: main.py brute [OPTIONS]                                                                
+                                                                                            
+ Joomla login bruteforce tool.                                                                
+                                                                                            
+╭─ Options ──────────────────────────────────────────────────────────────────────────────────╮
+│ *  --url       -u        TEXT     The Joomla URL to scan. [default: None] [required]       │
+│ *  --wordlist  -w        TEXT     Path to wordlist file. [default: None] [required]        │
+│    --username  -usr      TEXT     Username to bruteforce. [default: admin]                 │
+│    --threads   -t        INTEGER  Number of threads to use for bruteforce. [default: 8]    │
+│    --verbose   -v                 Show verbose output.                                     │
+│    --help                         Show this message and exit.                              │
+╰────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+Example of brute:
+```
+uv run main.py brute --url http://example.com --wordlist /usr/path/wordlist.txt
+python3 main.py brute --url http://example.com --wordlist /usr/path/wordlist.txt
 ```
 
 # Screenshot
